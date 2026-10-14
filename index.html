@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sopa de Letras Interactiva - Metodología CETO & IA</title>
+<style>
+:root {
+  --bg-color: #0f172a;
+  --card-bg: #1e293b;
+  --text-color: #f8fafc;
+  --accent-color: #38bdf8;
+  --border-color: #334155;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+h1 {
+  font-size: 2.2rem;
+  color: var(--accent-color);
+  margin-bottom: 8px;
+}
+p.subtitle {
+  font-size: 1.1rem;
+  color: #94a3b8;
+}
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+  max-width: 1200px;
+  width: 100%;
+}
+.board-container {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(18, 38px);
+  grid-template-rows: repeat(18, 38px);
+  gap: 4px;
+}
+.cell {
+  background-color: #0f172a;
+  border: 1px solid var(--border-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #e2e8f0;
+  user-select: none;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.cell:hover {
+  background-color: #334155;
+  cursor: pointer;
+}
+@keyframes titileo {
+  0% { opacity: 1; transform: scale(1); filter: brightness(1); }
+  50% { opacity: 0.6; transform: scale(1.05); filter: brightness(1.3); }
+  100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+}
+.highlight-CONTEXTO {background-color: #FF5733 !important; color: #000 !important; animation: titileo 2s infinite ease-in-out; }
+.highlight-EXPERTO {background-color: #2ecc71 !important; color: #000 !important; animation: titileo 1.8s infinite ease-in-out; }
+.highlight-TAREA {background-color: #3498db !important; color: #fff !important; animation: titileo 2.2s infinite ease-in-out; }
+.highlight-SALIDA {background-color: #f1c40f !important; color: #000 !important; animation: titileo 1.9s infinite ease-in-out; }
+.highlight-ALGORITMO { background-color: #e84393 !important; color: #fff !important; animation: titileo 2.1s infinite ease-in-out; }
+.highlight-MODELO {background-color: #00cec9 !important; color: #000 !important; animation: titileo 1.7s infinite ease-in-out; }
+.highlight-INTELIGENCIA {background-color: #e67e22 !important; color: #fff !important; animation: titileo 2.3s infinite ease-in-out; }
+.highlight-DATOS {background-color: #9b59b6 !important; color: #fff !important; animation: titileo 2s infinite ease-in-out; }
+.highlight-APRENDIZAJE {background-color: #1abc9c !important; color: #000 !important; animation: titileo 1.6s infinite ease-in-out; }
+.highlight-ANALISIS { background-color: #e74c3c !important; color: #fff !important; animation: titileo 2.4s infinite ease-in-out; }
+
+.sidebar {
+  background: var(--card-bg);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  min-width: 320px;
+  flex: 1;
+}
+.sidebar h2 {
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  color: var(--accent-color);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 8px;
+}
+.word-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.word-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #0f172a;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  border-left: 5px solid #64748b;
+  transition: all 0.3s;
+}
+.word-item.found {
+  text-decoration: line-through;
+  opacity: 0.7;
+  border-left-color: #2ecc71;
+  background: #1e293b;
+}
+.color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+.controls {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primary {
+  background-color: #0284c7;
+  color: white;
+}
+.btn-primary:hover {
+  background-color: #0369a1;
+}
+.btn-secondary {
+  background-color: #475569;
+  color: white;
+}
+.btn-secondary:hover {
+  background-color: #334155;
+}
+.stats {
+  margin-top: 15px;
+  font-size: 0.95rem;
+  color: #94a3b8;
+  text-align: center;
+}
+@media (max-width: 850px) {
+  .grid {
+    grid-template-columns: repeat(18, 24px);
+    grid-template-rows: repeat(18, 24px);
+    font-size: 0.8rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Sopa de Letras Interactiva</h1>
+  <p class="subtitle">Diplomado en Analisis de Datos, IA y Herramientas Tecnológicas (Metodologia CETO)</p>
+</header>
+
+<div class="container">
+  <div class="board-container">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="sidebar">
+    <h2>Palabras Clave (10)</h2>
+    <ul class="word-list" id="wordList">
+      <li class="word-item" id="li-CONTEXTO"><span style="display:flex; align-items:center;"><span class="color-dot" style="background:#FF5733"></span>CONTEXTO</span></li>
+      <li class="word-item" id="li-EXPERTO"><span style="display: flex; align-items:center;"><span class="color-dot" style="background:#2ecc71"></span>EXPERTO</span></li>
+      <li class="word-item" id="li-TAREA"><span style="display: flex; align-items:center;"><span class="color-dot" style="background:#3498db"></span>TAREA</span></li>
+      <li class="word-item" id="li-SALIDA"><span style="display:flex;align-items:center;"><span class="color-dot" style="background:#f1c40f"></span>SALIDA</span></li>
+      <li class="word-item" id="li-ALGORITMO"><span style="display:flex; align-items:center;"><span class="color-dot" style="background:#e84393"></span>ALGORITMO</span></li>
+      <li class="word-item" id="li-MODELO"><span style="display:flex;align-items:center;"><span class="color-dot" style="background:#00cec9"></span>MODELO</span></li>
+      <li class="word-item" id="li-INTELIGENCIA"><span style="display:flex; align-items:center;"><span class="color-dot" style="background:#e67e22"></span>INTELIGENCIA</span></li>
+      <li class="word-item" id="li-DATOS"><span style="display: flex;align-items:center;"><span class="color-dot" style="background:#9b59b6"></span>DATOS</span></li>
+      <li class="word-item" id="li-APRENDIZAJE"><span style="display: flex; align-items:center;"><span class="color-dot" style="background:#1abc9c"></span>APRENDIZAJE</span></li>
+      <li class="word-item" id="li-ANALISIS"><span style="display:flex;align-items:center;"><span class="color-dot" style="background:#e74c3c"></span>ANALISIS</span></li>
+    </ul>
+
+    <div class="controls">
+      <button class="btn-primary" onclick="revealAll()">Revelar Solución</button>
+      <button class="btn-secondary" onclick="resetGame()">Reiniciar</button>
+    </div>
+
+    <div class="stats" id="stats">Palabras encontradas: 0 de 10</div>
+  </div>
+</div>
+
+<script>
+const gridData = [
+  ["C", "W", "Q", "U", "B", "U", "L", "R", "A", "X", "T", "V", "K", "O", "A", "J", "X", "Y"],
+  ["T", "F", "F", "W", "K", "K", "W", "K", "O", "N", "B", "V", "G", "W", "U", "A", "U", "J"],
+  ["X", "H", "H", "U", "K", "Q", "C", "D", "S", "J", "A", "C", "P", "A", "I", "T", "E", "K"],
+  ["K", "K", "W", "W", "V", "E", "E", "J", "F", "O", "H", "L", "X", "Z", "P", "O", "A", "P"],
+  ["A", "Q", "D", "A", "Y", "B", "O", "D", "D", "X", "T", "P", "I", "N", "Y", "C", "R", "T"],
+  ["T", "K", "O", "T", "X", "E", "T", "N", "O", "C", "L", "A", "S", "S", "R", "G", "A", "O"],
+  ["X", "A", "G", "Q", "F", "B", "F", "A", "T", "N", "D", "G", "D", "Y", "I", "I", "K", "M"],
+  ["W", "P", "K", "C", "X", "D", "F", "M", "U", "T", "L", "O", "F", "O", "C", "S", "R", "T"],
+  ["J", "R", "G", "F", "Y", "A", "E", "P", "O", "O", "A", "Z", "X", "N", "X", "V", "R", "I"],
+  ["A", "E", "Y", "X", "Y", "G", "A", "O", "Q", "D", "E", "P", "E", "D", "K", "O", "F", "R"],
+  ["E", "N", "D", "N", "X", "U", "D", "V", "V", "U", "E", "G", "N", "W", "K", "S", "K", "O"],
+  ["R", "D", "E", "S", "K", "H", "U", "S", "U", "C", "I", "L", "L", "R", "G", "M", "T", "G"],
+  ["A", "I", "R", "X", "A", "M", "W", "L", "B", "L", "A", "M", "O", "B", "J", "Q", "G", "L"],
+  ["T", "Z", "Q", "L", "C", "L", "A", "E", "E", "Z", "T", "P", "R", "F", "A", "S", "Q", "A"],
+  ["B", "A", "K", "P", "S", "J", "I", "T", "D", "H", "Z", "M", "S", "H", "K", "F", "R", "T"],
+  ["W", "J", "I", "O", "V", "M", "N", "D", "R", "L", "K", "O", "T", "R", "E", "P", "X", "E"],
+  ["H", "E", "W", "T", "N", "I", "E", "B", "A", "V", "D", "A", "M", "X", "H", "I", "G", "W"],
+  ["O", "P", "J", "D", "H", "O", "C", "N", "R", "P", "R", "F", "X", "L", "I", "G", "M", "R"]
+];
+
+const wordCoordinates = [
+  { "word": "INTELIGENCIA", "coords": [[16, 5], [15, 6], [14, 7], [13, 8], [12, 9], [11, 10], [10, 11], [9, 12], [8, 13], [7, 14], [6, 15], [5, 16]] },
+  { "word": "APRENDIZAJE", "coords": [[6, 1], [7, 1], [8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1]] },
+  { "word": "ALGORITMO", "coords": [[13, 17], [12, 17], [11, 17], [10, 17], [9, 17], [8, 17], [7, 17], [6, 17], [5, 17]] },
+  { "word": "CONTEXTO", "coords": [[5, 9], [5, 8], [5, 7], [5, 6], [5, 5], [5, 4], [5, 3], [5, 2]] },
+  { "word": "ANALISIS", "coords": [[0, 8], [1, 9], [2, 10], [3, 11], [4, 12], [5, 13], [6, 14], [7, 15]] },
+  { "word": "EXPERTO", "coords": [[15, 17], [15, 16], [15, 15], [15, 14], [15, 13], [15, 12], [15, 11]] },
+  { "word": "SALIDA", "coords": [[11, 3], [12, 4], [13, 5], [14, 6], [15, 7], [16, 8]] },
+  { "word": "MODELO", "coords": [[7, 7], [8, 8], [9, 9], [10, 10], [11, 11], [12, 12]] },
+  { "word": "TAREA", "coords": [[13, 0], [12, 0], [11, 0], [10, 0], [9, 0]] },
+  { "word": "DATOS", "coords": [[6, 12], [5, 11], [4, 10], [3, 9], [2, 8]] }
+];
+
+const gridElement = document.getElementById('grid');
+let foundWords = new Set();
+
+function initGrid() {
+  gridElement.innerHTML = '';
+  for (let r = 0; r < gridData.length; r++) {
+    for (let c = 0; c < gridData[r].length; c++) {
+      const cell = document.createElement('div');
+      cell.dataset.row = r;
+      cell.className = 'cell';
+      cell.dataset.col = c;
+      cell.textContent = gridData[r][c];
+      gridElement.appendChild(cell);
+    }
+  }
+}
+
+function revealAll() {
+  wordCoordinates.forEach(item => {
+    foundWords.add(item.word);
+    const li = document.getElementById('li-' + item.word);
+    if (li) li.classList.add('found');
+    item.coords.forEach(([r, c]) => {
+      const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+      if (cell) {
+        cell.classList.add('highlight-' + item.word);
+      }
+    });
+  });
+  document.getElementById('stats').textContent = 'Palabras encontradas: 10 de 10 Completado!';
+}
+
+function resetGame() {
+  foundWords.clear();
+  document.querySelectorAll('.word-item').forEach(li => li.classList.remove('found'));
+  document.querySelectorAll('.cell').forEach(cell => {
+    cell.className = 'cell';
+  });
+  document.getElementById('stats').textContent = 'Palabras encontradas: 0 de 10';
+}
+
+window.onload = () => {
+  initGrid();
+  revealAll();
+};
+</script>
+</body>
+</html>
